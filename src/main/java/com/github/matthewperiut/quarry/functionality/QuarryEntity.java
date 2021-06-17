@@ -1,20 +1,21 @@
 package com.github.matthewperiut.quarry.functionality;
 
 import com.github.matthewperiut.quarry.Quarry;
+import com.github.matthewperiut.quarry.functionality.QuarryInventory;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.DefaultedList;
 import net.minecraft.util.Tickable;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.text.LiteralText;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 
 import team.reborn.energy.EnergySide;
@@ -25,7 +26,7 @@ import java.util.List;
 
 import static net.minecraft.block.Blocks.*;
 
-public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryInventory, Tickable// implements EnergyIo
+public class QuarryEntity extends BlockEntity implements EnergyStorage, Tickable, QuarryInventory// implements EnergyIo
 {
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(1, ItemStack.EMPTY);
     private final QuarryValidity quarryValidity = new QuarryValidity();
@@ -51,7 +52,7 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         {
             PlayerEntity player = world.getClosestPlayer(blockPos.getX(), blockPos.getY(), blockPos.getZ(), 10, false);
             if (player != null)
-                player.sendMessage(new LiteralText("Invalid placement: use landmark"), true);
+                player.sendMessage(new LiteralText("Invalid placement: use landmark"));
         }
         else
         {
@@ -101,12 +102,12 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         if(me.yProgress < 3)
             return;
 
-        if(!me.getStack(0).isEmpty())
+        if(!me.getInvStack(0).isEmpty())
             return;
 
         if (me.energy == 1000)
         {
-            if (me.getStack(0).isEmpty())
+            if (me.getInvStack(0).isEmpty())
             {
                 me.mine(world);
             }
@@ -135,7 +136,7 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         world.getBlockState(collect).getBlock();
         List<ItemStack> resources = Block.getDroppedStacks(world.getBlockState(collect),(ServerWorld)world,collect,world.getBlockEntity(pos));
         if(!resources.isEmpty())
-            setStack(0, resources.get(0));
+            setInvStack(0, resources.get(0));
         world.setBlockState(collect,AIR.getDefaultState());
 
         energy = 0;
@@ -163,9 +164,9 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
     }
 
     @Override
-    public void fromTag(BlockState state, NbtCompound tag)
+    public void fromTag(CompoundTag tag)
     {
-        super.fromTag(state,tag);
+        super.fromTag(tag);
         xProgress = tag.getInt("xProgress");
         yProgress = tag.getInt("yProgress");
         zProgress = tag.getInt("zProgress");
@@ -177,12 +178,12 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         int y = tag.getInt("spy");
         int z = tag.getInt("spz");
         startingPoint = new BlockPos(x,y,z);
-        Inventories.readNbt(tag,items);
+        Inventories.fromTag(tag,items);
     }
     @Override
-    public NbtCompound writeNbt(NbtCompound tag)
+    public CompoundTag toTag(CompoundTag tag)
     {
-        super.writeNbt(tag);
+        super.toTag(tag);
         tag.putInt("xProgress", xProgress);
         tag.putInt("yProgress", yProgress);
         tag.putInt("zProgress", zProgress);
@@ -193,7 +194,7 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         tag.putInt("spx", startingPoint.getX());
         tag.putInt("spy", startingPoint.getY());
         tag.putInt("spz", startingPoint.getZ());
-        Inventories.writeNbt(tag,items);
+        Inventories.toTag(tag,items);
         return tag;
     }
 
