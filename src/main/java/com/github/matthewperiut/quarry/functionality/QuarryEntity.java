@@ -3,9 +3,11 @@ package com.github.matthewperiut.quarry.functionality;
 import com.github.matthewperiut.quarry.Quarry;
 
 import com.github.matthewperiut.quarry.utility.LandmarkDetection;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -20,7 +22,7 @@ import team.reborn.energy.EnergyStorage;
 import team.reborn.energy.EnergyTier;
 
 import static net.minecraft.block.Blocks.AIR;
-import static net.minecraft.util.math.MathHelper.floor;
+import static net.minecraft.block.Blocks.BEDROCK;
 
 public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryInventory// implements EnergyIo
 {
@@ -117,11 +119,13 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
             }
 
             xProgress++;
-        } while(world.getBlockState(startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress))).getBlock() == AIR);
+        } while(world.getBlockState(startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress))).getBlock() == AIR ||
+                world.getBlockState(startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress))).getBlock() == BEDROCK);
 
         BlockPos collect = startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress));
 
-        setStack(0, new ItemStack(world.getBlockState(collect).getBlock()));
+        world.getBlockState(collect).getBlock();
+        setStack(0, Block.getDroppedStacks(world.getBlockState(collect),(ServerWorld)world,collect,world.getBlockEntity(pos)).get(0));
         world.setBlockState(collect,AIR.getDefaultState());
 
         energy = 0;

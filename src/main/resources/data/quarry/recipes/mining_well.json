@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "INI",
+    "IDI",
+    "IGI"
+  ],
+  "key": {
+    "N": {
+      "item": "minecraft:netherite_pickaxe"
+    },
+    "D": {
+      "item": "minecraft:diamond_pickaxe"
+    },
+    "G": {
+      "item": "minecraft:golden_pickaxe"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
+    }
+  },
+  "result": {
+    "item": "quarry:mining_well",
+    "count": 1
+  }
+}
