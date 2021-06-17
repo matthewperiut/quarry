@@ -11,7 +11,8 @@ public class LandmarkDetection {
         int limit = 128;
         boolean[] functional = {false, false, false};
         for (int i = -limit / 2; i < limit / 2; i++) {
-            if (i == 0)
+            // Making sure a terrible arrangement isn't made
+            if (i > -2 && i < 2)
                 continue;
 
             BlockPos xCheck = new BlockPos(pos.getX() + i, pos.getY(), pos.getZ());

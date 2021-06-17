@@ -21,8 +21,9 @@ import team.reborn.energy.EnergySide;
 import team.reborn.energy.EnergyStorage;
 import team.reborn.energy.EnergyTier;
 
-import static net.minecraft.block.Blocks.AIR;
-import static net.minecraft.block.Blocks.BEDROCK;
+import java.util.List;
+
+import static net.minecraft.block.Blocks.*;
 
 public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryInventory// implements EnergyIo
 {
@@ -63,6 +64,11 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         }
     }
 
+    private boolean unsafeBlock(World world, Block block)
+    {
+        return world.getBlockState(startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress))).getBlock() == block;
+    }
+
     public static <T extends BlockEntity> void tick(World world, BlockPos blockPos, BlockState blockState, T t) {
         // Checks of validity
         if (world.isClient())
@@ -89,7 +95,7 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         // and this one =-= https://fabricmc.net/wiki/tutorial:inventory
 
         //tif(me.progress)
-        if(me.yProgress == 0)
+        if(me.yProgress < 3)
             return;
 
         if(!me.getStack(0).isEmpty())
@@ -119,13 +125,14 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
             }
 
             xProgress++;
-        } while(world.getBlockState(startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress))).getBlock() == AIR ||
-                world.getBlockState(startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress))).getBlock() == BEDROCK);
+        } while(unsafeBlock(world, AIR) || unsafeBlock(world, BEDROCK) || unsafeBlock(world, END_PORTAL_FRAME) || unsafeBlock(world,END_PORTAL) || unsafeBlock(world,END_GATEWAY));
 
         BlockPos collect = startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress));
 
         world.getBlockState(collect).getBlock();
-        setStack(0, Block.getDroppedStacks(world.getBlockState(collect),(ServerWorld)world,collect,world.getBlockEntity(pos)).get(0));
+        List<ItemStack> resources = Block.getDroppedStacks(world.getBlockState(collect),(ServerWorld)world,collect,world.getBlockEntity(pos));
+        if(!resources.isEmpty())
+            setStack(0, resources.get(0));
         world.setBlockState(collect,AIR.getDefaultState());
 
         energy = 0;

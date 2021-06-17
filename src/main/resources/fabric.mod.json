@@ -9,7 +9,8 @@
     "Slainlight"
   ],
   "contact": {
-    "sources": "https://github.com/matthewperiut/quarry"
+    "sources": "https://github.com/matthewperiut/quarry",
+    "issues": "https://github.com/matthewperiut/quarry/issues"
   },
 
   "license": "CC0-1.0",
@@ -29,7 +30,6 @@
     "java": ">=16"
   },
   "suggests": {
-    "indrev": "*",
     "techreborn": "*"
   }
 }
