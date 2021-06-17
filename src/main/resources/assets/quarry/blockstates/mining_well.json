@@ -1,0 +1,9 @@
+
+{
+  "variants": {
+    "facing=north": { "model": "quarry:block/mining_well" },
+    "facing=east":  { "model": "quarry:block/mining_well", "y":  90},
+    "facing=south": { "model": "quarry:block/mining_well", "y": 180 },
+    "facing=west":  { "model": "quarry:block/mining_well", "y": 270 }
+  }
+}

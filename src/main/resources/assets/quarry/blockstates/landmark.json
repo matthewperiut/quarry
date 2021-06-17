@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "quarry:block/landmark"
+    }
+  }
+}

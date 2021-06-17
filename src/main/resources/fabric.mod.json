@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "quarry",
+  "version": "${version}",
+
+  "name": "BC Quarry",
+  "description": "Implementing the BC Quarry in modern minecraft",
+  "authors": [
+    "Slainlight"
+  ],
+  "contact": {
+    "sources": "https://github.com/matthewperiut/quarry"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/quarry/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.github.matthewperiut.quarry.Quarry"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  },
+  "suggests": {
+    "indrev": "*",
+    "techreborn": "*"
+  }
+}
