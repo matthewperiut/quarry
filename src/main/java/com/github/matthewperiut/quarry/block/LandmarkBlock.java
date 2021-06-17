@@ -1,9 +1,10 @@
 package com.github.matthewperiut.quarry.block;
 
-import com.github.matthewperiut.quarry.Quarry;
+import com.github.matthewperiut.quarry.utility.LandmarkDetection;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.TorchBlock;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -23,37 +24,25 @@ public class LandmarkBlock extends TorchBlock {
         //remove particle effects
     }
 
-    //@Override
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit)
     {
-        // Limit 63 blocks out to search for another
-        int limit = 128;
-        if(!world.isClient)
-            for(int i = -limit/2; i < limit/2; i++)
-            {
-                if(i == 0)
-                    continue;
+        if(world.isClient)
+        {
+            LandmarkDetection landmarkDetection = new LandmarkDetection();
+            int linkStatus = landmarkDetection.getCount(pos, world);
 
-                BlockPos xCheck = new BlockPos(pos.getX()+i, pos.getY(), pos.getZ());
-                BlockPos yCheck = new BlockPos(pos.getX(), pos.getY()+i, pos.getZ());
-                BlockPos zCheck = new BlockPos(pos.getX(), pos.getY(), pos.getZ()+i);
-                if(world.getBlockState(xCheck) == Quarry.LANDMARK_BLOCK.getDefaultState())
-                {
-                    System.out.println(xCheck);
-                }
-                if(world.getBlockState(yCheck) == Quarry.LANDMARK_BLOCK.getDefaultState())
-                {
-                    System.out.println(yCheck);
-                }
-                if(world.getBlockState(zCheck) == Quarry.LANDMARK_BLOCK.getDefaultState())
-                {
-                    System.out.println(zCheck);
-                }
-            }
+            String defaultText = " (" + linkStatus + "/3)";
+            String message = switch (linkStatus) {
+                case 1 -> "Place 3 Landmarks in straight lines, check with corner";
+                case 2 -> "Make sure you're checking the corner, not edges";
+                case 3 -> "Place a Quarry next to the corner Landmark";
+                default -> "";
+            };
+
+            player.sendMessage(new LiteralText(message+defaultText), true);
+        }
+
         return ActionResult.SUCCESS;
-        //return super.onUse(state, world, pos, player, hand, hit);
     }
-
-
 }
