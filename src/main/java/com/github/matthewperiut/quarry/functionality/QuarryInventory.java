@@ -4,7 +4,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.DefaultedList;
 
 /**
  * A simple {@code Inventory} implementation with only default methods + an item list getter.
@@ -12,120 +12,97 @@ import net.minecraft.util.collection.DefaultedList;
  * Originally by Juuz
  */
 public interface QuarryInventory extends Inventory {
-
     /**
-     * Retrieves the item list of this inventory.
+     * Gets the item list of this inventory.
      * Must return the same instance every time it's called.
      */
     DefaultedList<ItemStack> getItems();
-
+    // Creation
     /**
      * Creates an inventory from the item list.
      */
     static QuarryInventory of(DefaultedList<ItemStack> items) {
         return () -> items;
     }
-
     /**
-     * Creates a new inventory with the specified size.
+     * Creates a new inventory with the size.
      */
     static QuarryInventory ofSize(int size) {
         return of(DefaultedList.ofSize(size, ItemStack.EMPTY));
     }
-
+    // Inventory
     /**
      * Returns the inventory size.
      */
     @Override
-    default int size() {
+    default int getInvSize() {
         return getItems().size();
     }
-
     /**
-     * Checks if the inventory is empty.
-     * @return true if this inventory has only empty stacks, false otherwise.
+     * @return true if this inventory has only empty stacks, false otherwise
      */
     @Override
-    default boolean isEmpty() {
-        for (int i = 0; i < size(); i++) {
-            ItemStack stack = getStack(i);
+    default boolean isInvEmpty() {
+        for (int i = 0; i < getInvSize(); i++) {
+            ItemStack stack = getInvStack(i);
             if (!stack.isEmpty()) {
                 return false;
             }
         }
         return true;
     }
-
     /**
-     * Retrieves the item in the slot.
+     * Gets the item in the slot.
      */
     @Override
-    default ItemStack getStack(int slot) {
+    default ItemStack getInvStack(int slot) {
         return getItems().get(slot);
     }
-
     /**
-     * Removes items from an inventory slot.
-     * @param slot  The slot to remove from.
-     * @param count How many items to remove. If there are less items in the slot than what are requested,
-     *              takes all items in that slot.
+     * Takes a stack of the size from the slot.
+     * <p>(default implementation) If there are less items in the slot than what are requested,
+     * takes all items in that slot.
      */
     @Override
-    default ItemStack removeStack(int slot, int count) {
+    default ItemStack takeInvStack(int slot, int count) {
         ItemStack result = Inventories.splitStack(getItems(), slot, count);
         if (!result.isEmpty()) {
             markDirty();
         }
         return result;
     }
-
     /**
-     * Removes all items from an inventory slot.
-     * @param slot The slot to remove from.
+     * Removes the current stack in the {@code slot} and returns it.
      */
     @Override
-    default ItemStack removeStack(int slot) {
+    default ItemStack removeInvStack(int slot) {
         return Inventories.removeStack(getItems(), slot);
     }
-
     /**
-     * Replaces the current stack in an inventory slot with the provided stack.
-     * @param slot  The inventory slot of which to replace the itemstack.
-     * @param stack The replacing itemstack. If the stack is too big for
-     *              this inventory ({@link Inventory#getMaxCountPerStack()}),
-     *              it gets resized to this inventory's maximum amount.
+     * Replaces the current stack in the {@code slot} with the provided stack.
+     * <p>If the stack is too big for this inventory ({@link Inventory#getInvMaxStackAmount()}),
+     * it gets resized to this inventory's maximum amount.
      */
     @Override
-    default void setStack(int slot, ItemStack stack) {
+    default void setInvStack(int slot, ItemStack stack) {
         getItems().set(slot, stack);
-        if (stack.getCount() > getMaxCountPerStack()) {
-            stack.setCount(getMaxCountPerStack());
+        if (stack.getCount() > getInvMaxStackAmount()) {
+            stack.setCount(getInvMaxStackAmount());
         }
     }
-
     /**
-     * Clears the inventory.
+     * Clears {@linkplain #getItems() the item list}}.
      */
     @Override
     default void clear() {
         getItems().clear();
     }
-
-    /**
-     * Marks the state as dirty.
-     * Must be called after changes in the inventory, so that the game can properly save
-     * the inventory contents and notify neighboring blocks of inventory changes.
-     */
     @Override
     default void markDirty() {
         // Override if you want behavior.
     }
-
-    /**
-     * @return true if the player can use the inventory, false otherwise.
-     */
     @Override
-    default boolean canPlayerUse(PlayerEntity player) {
+    default boolean canPlayerUseInv(PlayerEntity player) {
         return true;
     }
 }

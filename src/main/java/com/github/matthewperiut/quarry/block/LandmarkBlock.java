@@ -15,7 +15,7 @@ import java.util.Random;
 
 public class LandmarkBlock extends TorchBlock {
     public LandmarkBlock(Settings settings) {
-        super(settings, null);
+        super(settings);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class LandmarkBlock extends TorchBlock {
                 default -> "";
             };
 
-            player.sendMessage(new LiteralText(message+defaultText), true);
+            player.sendMessage(new LiteralText(message+defaultText));
         }
 
         return ActionResult.SUCCESS;
