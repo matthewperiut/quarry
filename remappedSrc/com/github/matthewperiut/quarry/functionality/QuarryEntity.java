@@ -7,7 +7,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Tickable;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -25,7 +24,7 @@ import java.util.List;
 
 import static net.minecraft.block.Blocks.*;
 
-public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryInventory, Tickable// implements EnergyIo
+public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryInventory// implements EnergyIo
 {
     private final DefaultedList<ItemStack> items = DefaultedList.ofSize(1, ItemStack.EMPTY);
     private final QuarryValidity quarryValidity = new QuarryValidity();
@@ -69,20 +68,17 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         return world.getBlockState(startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress))).getBlock() == block;
     }
 
-    @Override
-    public void tick() {
+    public static <T extends BlockEntity> void tick(World world, BlockPos blockPos, BlockState blockState, T t) {
         // Checks of validity
-        if(!hasWorld() && world != null)
-            return;
         if (world.isClient())
             return;
-        QuarryEntity me = (QuarryEntity) world.getBlockEntity(getPos());
+        QuarryEntity me = (QuarryEntity) world.getBlockEntity(blockPos);
         if (me == null)
             return;
         if (!me.init)
         {
             me.init = true;
-            me.validityNotification(world,getPos());
+            me.validityNotification(world,blockPos);
         }
         if (!me.quarryValidity.valid && me.init)
             return;
@@ -162,26 +158,9 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         return EnergyTier.INFINITE;
     }
 
+    // Serialize the BlockEntity
     @Override
-    public void fromTag(BlockState state, NbtCompound tag)
-    {
-        super.fromTag(state,tag);
-        xProgress = tag.getInt("xProgress");
-        yProgress = tag.getInt("yProgress");
-        zProgress = tag.getInt("zProgress");
-        energy = tag.getDouble("energy");
-        init = tag.getBoolean("init");
-        xSize = tag.getInt("xSize");
-        zSize = tag.getInt("zSize");
-        int x = tag.getInt("spx");
-        int y = tag.getInt("spy");
-        int z = tag.getInt("spz");
-        startingPoint = new BlockPos(x,y,z);
-        Inventories.readNbt(tag,items);
-    }
-    @Override
-    public NbtCompound writeNbt(NbtCompound tag)
-    {
+    public NbtCompound writeNbt(NbtCompound tag) {
         super.writeNbt(tag);
         tag.putInt("xProgress", xProgress);
         tag.putInt("yProgress", yProgress);
@@ -190,11 +169,27 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         tag.putBoolean("init", init);
         tag.putInt("xSize", xSize);
         tag.putInt("zSize", zSize);
-        tag.putInt("spx", startingPoint.getX());
-        tag.putInt("spy", startingPoint.getY());
-        tag.putInt("spz", startingPoint.getZ());
+        tag.putInt("x", startingPoint.getX());
+        tag.putInt("y", startingPoint.getY());
+        tag.putInt("z", startingPoint.getZ());
         Inventories.writeNbt(tag,items);
         return tag;
+    }
+    @Override
+    public void toTag(NbtCompound tag) {
+        super.fromTag(tag);
+        xProgress = tag.getInt("xProgress");
+        yProgress = tag.getInt("yProgress");
+        zProgress = tag.getInt("zProgress");
+        energy = tag.getDouble("energy");
+        init = tag.getBoolean("init");
+        xSize = tag.getInt("xSize");
+        zSize = tag.getInt("zSize");
+        int x = tag.getInt("x");
+        int y = tag.getInt("y");
+        int z = tag.getInt("z");
+        startingPoint = new BlockPos(x,y,z);
+        Inventories.readNbt(tag,items);
     }
 
     @Override
