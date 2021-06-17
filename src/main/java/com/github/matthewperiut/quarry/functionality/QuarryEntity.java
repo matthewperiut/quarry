@@ -2,7 +2,12 @@ package com.github.matthewperiut.quarry.functionality;
 
 import com.github.matthewperiut.quarry.Quarry;
 
+import com.github.matthewperiut.quarry.utility.LandmarkDetection;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.BlockState;
@@ -14,11 +19,22 @@ import team.reborn.energy.EnergySide;
 import team.reborn.energy.EnergyStorage;
 import team.reborn.energy.EnergyTier;
 
-public class QuarryEntity extends BlockEntity implements EnergyStorage// implements EnergyIo
+import static net.minecraft.block.Blocks.AIR;
+import static net.minecraft.util.math.MathHelper.floor;
+
+public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryInventory// implements EnergyIo
 {
+    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(1, ItemStack.EMPTY);
     private final QuarryValidity quarryValidity = new QuarryValidity();
     private double energy = 0.f;
-    private int progress = 0;
+    private int xProgress = 0;
+    private int yProgress = 0;
+    private int zProgress = 0;
+
+    BlockPos startingPoint = null;
+    int xSize = 0;
+    int zSize = 0;
+
     boolean init = false;
 
     public QuarryEntity(BlockPos pos, BlockState state) {
@@ -33,7 +49,15 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage// impleme
             PlayerEntity player = world.getClosestPlayer(blockPos.getX(), blockPos.getY(), blockPos.getZ(), 10, false);
             if (player != null)
                 player.sendMessage(new LiteralText("Invalid placement: use landmark"), true);
-
+        }
+        else
+        {
+            startingPoint = quarryValidity.landmarkDetection.getStart();
+            xSize = quarryValidity.landmarkDetection.getXSize();
+            zSize = quarryValidity.landmarkDetection.getZSize();
+            yProgress = startingPoint.getY();
+            xProgress = 0;
+            zProgress = 0;
         }
     }
 
@@ -61,6 +85,46 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage// impleme
         // I'll make it look prettier over time.
         // I need this bad boy -> world.getBlockState(blockPos).getBlock().asItem();
         // and this one =-= https://fabricmc.net/wiki/tutorial:inventory
+
+        //tif(me.progress)
+        if(me.yProgress == 0)
+            return;
+
+        if(!me.getStack(0).isEmpty())
+            return;
+
+        if (me.energy == 1000)
+        {
+            if (me.getStack(0).isEmpty())
+            {
+                me.mine(world);
+            }
+        }
+    }
+
+    private void mine(World world)
+    {
+        do {
+            if(xProgress == xSize+1)
+            {
+                xProgress = 0;
+                zProgress++;
+            }
+            if(zProgress == zSize+1)
+            {
+                zProgress = 0;
+                yProgress--;
+            }
+
+            xProgress++;
+        } while(world.getBlockState(startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress))).getBlock() == AIR);
+
+        BlockPos collect = startingPoint.add(new Vec3i(xProgress-1,-(startingPoint.getY()-yProgress),zProgress));
+
+        setStack(0, new ItemStack(world.getBlockState(collect).getBlock()));
+        world.setBlockState(collect,AIR.getDefaultState());
+
+        energy = 0;
     }
 
     // Energize the BlockEntity
@@ -81,23 +145,45 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage// impleme
 
     @Override
     public EnergyTier getTier() {
-        return EnergyTier.MEDIUM;
+        return EnergyTier.INFINITE;
     }
 
     // Serialize the BlockEntity
     @Override
     public NbtCompound writeNbt(NbtCompound tag) {
         super.writeNbt(tag);
-        tag.putInt("progress", progress);
+        tag.putInt("xProgress", xProgress);
+        tag.putInt("yProgress", yProgress);
+        tag.putInt("zProgress", zProgress);
         tag.putDouble("energy", energy);
         tag.putBoolean("init", init);
+        tag.putInt("xSize", xSize);
+        tag.putInt("zSize", zSize);
+        tag.putInt("x", startingPoint.getX());
+        tag.putInt("y", startingPoint.getY());
+        tag.putInt("z", startingPoint.getZ());
+        Inventories.writeNbt(tag,items);
         return tag;
     }
     @Override
     public void readNbt(NbtCompound tag) {
         super.readNbt(tag);
-        progress = tag.getInt("progress");
+        xProgress = tag.getInt("xProgress");
+        yProgress = tag.getInt("yProgress");
+        zProgress = tag.getInt("zProgress");
         energy = tag.getDouble("energy");
         init = tag.getBoolean("init");
+        xSize = tag.getInt("xSize");
+        zSize = tag.getInt("zSize");
+        int x = tag.getInt("x");
+        int y = tag.getInt("y");
+        int z = tag.getInt("z");
+        startingPoint = new BlockPos(x,y,z);
+        Inventories.readNbt(tag,items);
+    }
+
+    @Override
+    public DefaultedList<ItemStack> getItems() {
+        return items;
     }
 }
