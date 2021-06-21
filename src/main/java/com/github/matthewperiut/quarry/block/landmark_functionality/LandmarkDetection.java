@@ -1,4 +1,4 @@
-package com.github.matthewperiut.quarry.utility;
+package com.github.matthewperiut.quarry.block.landmark_functionality;
 import static com.github.matthewperiut.quarry.Quarry.LANDMARK_BLOCK;
 
 import net.minecraft.util.math.BlockPos;

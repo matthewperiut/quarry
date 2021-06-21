@@ -1,8 +1,7 @@
-package com.github.matthewperiut.quarry.functionality;
+package com.github.matthewperiut.quarry.block.quarry_functionality;
 
 import com.github.matthewperiut.quarry.Quarry;
 
-import com.github.matthewperiut.quarry.utility.LandmarkDetection;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
@@ -170,9 +169,9 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         tag.putBoolean("init", init);
         tag.putInt("xSize", xSize);
         tag.putInt("zSize", zSize);
-        tag.putInt("x", startingPoint.getX());
-        tag.putInt("y", startingPoint.getY());
-        tag.putInt("z", startingPoint.getZ());
+        tag.putInt("spx", startingPoint.getX());
+        tag.putInt("spy", startingPoint.getY());
+        tag.putInt("spz", startingPoint.getZ());
         Inventories.writeNbt(tag,items);
         return tag;
     }
@@ -186,9 +185,9 @@ public class QuarryEntity extends BlockEntity implements EnergyStorage, QuarryIn
         init = tag.getBoolean("init");
         xSize = tag.getInt("xSize");
         zSize = tag.getInt("zSize");
-        int x = tag.getInt("x");
-        int y = tag.getInt("y");
-        int z = tag.getInt("z");
+        int x = tag.getInt("spx");
+        int y = tag.getInt("spy");
+        int z = tag.getInt("spz");
         startingPoint = new BlockPos(x,y,z);
         Inventories.readNbt(tag,items);
     }

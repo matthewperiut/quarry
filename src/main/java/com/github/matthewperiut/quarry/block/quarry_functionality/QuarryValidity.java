@@ -1,7 +1,7 @@
-package com.github.matthewperiut.quarry.functionality;
+package com.github.matthewperiut.quarry.block.quarry_functionality;
 
 import com.github.matthewperiut.quarry.Quarry;
-import com.github.matthewperiut.quarry.utility.LandmarkDetection;
+import com.github.matthewperiut.quarry.block.landmark_functionality.LandmarkDetection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;

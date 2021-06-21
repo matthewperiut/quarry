@@ -1,6 +1,6 @@
 package com.github.matthewperiut.quarry.block;
 
-import com.github.matthewperiut.quarry.utility.LandmarkDetection;
+import com.github.matthewperiut.quarry.block.landmark_functionality.LandmarkDetection;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.TorchBlock;
 import net.minecraft.entity.player.PlayerEntity;

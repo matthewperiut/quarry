@@ -2,7 +2,7 @@ package com.github.matthewperiut.quarry;
 
 import com.github.matthewperiut.quarry.block.LandmarkBlock;
 import com.github.matthewperiut.quarry.block.QuarryBlock;
-import com.github.matthewperiut.quarry.functionality.QuarryEntity;
+import com.github.matthewperiut.quarry.block.quarry_functionality.QuarryEntity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -32,7 +32,6 @@ public class Quarry implements ModInitializer {
 		Registry.register(Registry.ITEM, new Identifier("quarry", "landmark"), new BlockItem(LANDMARK_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
 
 		// Quarry
-
 		Registry.register(Registry.BLOCK, new Identifier("quarry", "mining_well"), MINING_WELL_BLOCK);
 		Registry.register(Registry.ITEM, new Identifier("quarry", "mining_well"), new BlockItem(MINING_WELL_BLOCK, new FabricItemSettings().group(ItemGroup.MISC)));
 		MINING_WELL_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, "quarry:mining_well_entity", FabricBlockEntityTypeBuilder.create(QuarryEntity::new, MINING_WELL_BLOCK).build(null));

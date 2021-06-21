@@ -1,4 +1,4 @@
-package com.github.matthewperiut.quarry.functionality;
+package com.github.matthewperiut.quarry.block.quarry_functionality;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
