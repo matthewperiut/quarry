@@ -33,11 +33,17 @@ public class LandmarkBlock extends TorchBlock {
             int linkStatus = landmarkDetection.getCount(pos, world);
 
             String defaultText = " (" + linkStatus + "/3)";
-            String message = switch (linkStatus) {
-                case 1 -> "Place 3 Landmarks in straight lines, check with corner";
-                case 2 -> "Make sure you're checking the corner, not edges";
-                case 3 -> "Place a Quarry next to the corner Landmark";
-                default -> "";
+            String message = "";
+            switch (linkStatus) {
+                case 1:
+                    message = "Place 3 Landmarks in straight lines, check with corner";
+                    break;
+                case 2:
+                    message = "Make sure you're checking the corner, not edges";
+                    break;
+                case 3:
+                    message = "Place a Quarry next to the corner Landmark";
+                    break;
             };
 
             player.sendMessage(new LiteralText(message+defaultText), true);
